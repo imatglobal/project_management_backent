@@ -1,0 +1,35 @@
+import mongoose, { Schema } from "mongoose";
+
+interface DepartmentSchema {
+  id: string;
+  title: string;
+  color: string;
+  description: string;
+}
+
+const departmentSchema = new Schema({
+  id: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  color: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+});
+
+const departmentModel = mongoose.model<DepartmentSchema>(
+  "Departments",
+  departmentSchema,
+);
+
+export default departmentModel;

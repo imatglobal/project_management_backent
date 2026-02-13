@@ -1,0 +1,39 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const user_routes_1 = __importDefault(require("./user_side/user_routes"));
+const db_connection_1 = __importDefault(require("./db_controllers/db_connection"));
+const admin_routes_1 = __importDefault(require("./admin_side/admin-routes"));
+const cors_1 = __importDefault(require("cors"));
+const passport_1 = __importDefault(require("passport"));
+const express_session_1 = __importDefault(require("express-session"));
+const app = (0, express_1.default)();
+const PORT = 8080;
+app.use((0, cors_1.default)({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    //credentials: true
+}));
+(0, db_connection_1.default)();
+app.use((0, express_session_1.default)({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false,
+        httpOnly: true,
+        maxAge: 24 * 2 * 60 * 60 * 1000,
+    },
+}));
+app.use(passport_1.default.initialize());
+app.use(passport_1.default.session());
+app.use(express_1.default.json());
+app.use("/", user_routes_1.default);
+app.use("/admin", admin_routes_1.default);
+app.listen(PORT, () => {
+    console.log(`server is running on ${PORT}`);
+});

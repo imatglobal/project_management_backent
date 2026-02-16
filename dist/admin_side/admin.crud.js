@@ -179,6 +179,7 @@ const adminCrudFunctions = (modules) => {
             return employes;
         },
         fetchHeadProjects: async (id) => {
+            console.log("head id", id);
             let data = await modules.find({ head_id: id });
             console.log("data", data);
             return data;
@@ -186,10 +187,9 @@ const adminCrudFunctions = (modules) => {
         assignTasks: async (employeeTaskts) => {
             console.log(employeeTaskts);
             let assigne = new modules(employeeTaskts);
-            await assigne
-                .save()
-                .then(async (data) => console.log(data));
-            // return data;
+            await assigne.save().then(async (data) => {
+                return data;
+            });
         },
         fetchTasks: async (id) => {
             let data = await modules.findOne({ projectId: id });

@@ -8,6 +8,7 @@ const user_auth_1 = require("./user_auth");
 const passport_1 = __importDefault(require("passport"));
 require("./Oauth2/google_oauth");
 require("./Oauth2/github_oauth");
+const user_Proj_controller_1 = require("./user_Proj_controller");
 const Router = express_1.default.Router();
 Router.post("/signup", (req, res) => {
     const { name, email, department, password } = req.body;
@@ -43,4 +44,6 @@ Router.get("/git_hub/oauth/callback", passport_1.default.authenticate("github", 
     successRedirect: "http://localhost:5173/app/gateway",
     failureRedirect: "http://localhost:5173/login",
 }));
+Router.get("/employee_included_proj", user_Proj_controller_1.emp_included_proj);
+Router.get("/emp_proj-tasks/:projectId", user_Proj_controller_1.emp_proj_tasks);
 exports.default = Router;

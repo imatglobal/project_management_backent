@@ -265,6 +265,7 @@ export const adminCrudFunctions = (modules: any) => {
       return employes;
     },
     fetchHeadProjects: async (id: string) => {
+      console.log("head id", id);
       let data = await modules.find({ head_id: id });
       console.log("data", data);
       return data;
@@ -272,10 +273,9 @@ export const adminCrudFunctions = (modules: any) => {
     assignTasks: async (employeeTaskts: IassignedTasks) => {
       console.log(employeeTaskts);
       let assigne = new modules(employeeTaskts);
-      await assigne
-        .save()
-        .then(async (data: IassignedTasks) => console.log(data));
-      // return data;
+      await assigne.save().then(async (data: IassignedTasks) => {
+        return data;
+      });
     },
     fetchTasks: async (id: string) => {
       let data = await modules.findOne({ projectId: id });

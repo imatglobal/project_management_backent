@@ -246,12 +246,12 @@ const adminCrudFunctions = (modules) => {
                 {
                     $lookup: {
                         from: "employee_sub_tasks",
-                        let: { id: "$emp_datas._id" },
+                        let: { empid: "$emp_datas._id" },
                         pipeline: [
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: ["$$id", { $toObjectId: "$user_id" }],
+                                        $eq: [{ $toObjectId: "$user_id" }, "$$empid"],
                                     },
                                 },
                             },
@@ -259,9 +259,6 @@ const adminCrudFunctions = (modules) => {
                         as: "sub_tasks",
                     },
                 },
-                // {
-                //   $unwind: "$sub_tasks",
-                // },
             ]);
             console.log(data);
         },

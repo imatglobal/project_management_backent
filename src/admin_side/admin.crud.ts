@@ -301,5 +301,63 @@ export const adminCrudFunctions = (modules: any) => {
           return data;
         });
     },
+    projectOverview: async (id: string) => {
+      // console.log("proj_id", id);
+      let data = await modules.aggregate([
+        {
+          $match: { projectId: id },
+        },
+
+        {
+          $lookup: {
+            from: "users",
+            let: { empIds: "$employeeTasks.employee" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $in: [
+                      "$_id",
+                      {
+                        $map: {
+                          input: "$$empIds",
+                          as: "id",
+                          in: { $toObjectId: "$$id" },
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: "emp_datas",
+          },
+        },
+        {
+          $unwind: "$emp_datas",
+        },
+
+        {
+          $lookup: {
+            from: "employee_sub_tasks",
+            let: { id: "$emp_datas._id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$$id", { $toObjectId: "$user_id" }],
+                  },
+                },
+              },
+            ],
+            as: "sub_tasks",
+          },
+        },
+        // {
+        //   $unwind: "$sub_tasks",
+        // },
+      ]);
+      console.log(data);
+    },
   };
 };

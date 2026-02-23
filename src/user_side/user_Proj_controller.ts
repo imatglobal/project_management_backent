@@ -4,6 +4,7 @@ import { ObjectId } from "mongoose";
 import { user_project_controller } from "./user_controller";
 import departmentProjectsModle from "../db_controllers/db_models/admin_side/department_projects";
 import assignedTasksModel from "../db_controllers/db_models/admin_side/assigen-tasks";
+import user_subTasks_todo from "../db_controllers/db_models/user_side/user_tasks_todo";
 interface IdecodedToken {
   id: ObjectId;
   iat: number;
@@ -42,6 +43,27 @@ export const emp_proj_tasks = async (
     let employe_proj_tasks =
       await assigned_tasks_for_emp.employee_assigned_tasks(encodedToken.id, id);
     res.status(200).json(employe_proj_tasks);
+  } catch (error) {
+    return error;
+  }
+};
+
+export const add_multiple_todos = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    let employeeTodo = req.body;
+    let token: any = req.headers.authorization;
+    let decodedToken: any = jwt.verify(token, "secret_key");
+    console.log("emp_id", decodedToken.id);
+    // console.log(employeeTodo);
+    let employee_sub_tasks = await user_project_controller(user_subTasks_todo);
+    let add_sub_taks = await employee_sub_tasks.add_sub_tasks_emp(
+      employeeTodo,
+      decodedToken.id,
+    );
   } catch (error) {
     return error;
   }

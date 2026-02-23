@@ -336,7 +336,6 @@ export const adminCrudFunctions = (modules: any) => {
         {
           $unwind: "$emp_datas",
         },
-
         {
           $lookup: {
             from: "employee_sub_tasks",
@@ -345,7 +344,15 @@ export const adminCrudFunctions = (modules: any) => {
               {
                 $match: {
                   $expr: {
-                    $eq: [{ $toObjectId: "$user_id" }, "$$empid"],
+                    $and: [
+                      { $eq: [{ $toObjectId: "$user_id" }, "$$empid"] },
+                      {
+                        $eq: [
+                          { $toObjectId: "$project_id" },
+                          { $toObjectId: id },
+                        ],
+                      },
+                    ],
                   },
                 },
               },
@@ -353,8 +360,18 @@ export const adminCrudFunctions = (modules: any) => {
             as: "sub_tasks",
           },
         },
+        {
+          $project: {
+            _id: 0,
+            "emp_datas.name": 1,
+            "emp_datas._id": 1,
+            employeeTasks: 1,
+            sub_tasks: 1,
+          },
+        },
       ]);
-      console.log(data);
+      // console.log(data);
+      return data;
     },
   };
 };

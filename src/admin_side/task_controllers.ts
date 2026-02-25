@@ -300,5 +300,6 @@ export const project_overview = async (
   const id = req.params.project_id;
   const projectOverview = adminCrudFunctions(assignedTasksModel);
   let overview = await projectOverview.projectOverview(id);
+  console.log("return", overview[0].sub_tasks);
   res.status(200).json(overview);
 };

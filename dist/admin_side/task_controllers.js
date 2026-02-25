@@ -193,6 +193,7 @@ const project_overview = async (req, res, next) => {
     const id = req.params.project_id;
     const projectOverview = (0, admin_crud_1.adminCrudFunctions)(assigen_tasks_1.default);
     let overview = await projectOverview.projectOverview(id);
+    console.log("return", overview[0].sub_tasks);
     res.status(200).json(overview);
 };
 exports.project_overview = project_overview;

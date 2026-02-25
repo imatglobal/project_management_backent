@@ -210,74 +210,89 @@ const adminCrudFunctions = (modules) => {
             });
         },
         projectOverview: async (id) => {
-            // console.log("proj_id", id);
             let data = await modules.aggregate([
                 {
                     $match: { projectId: id },
                 },
                 {
+                    $unwind: "$employeeTasks",
+                },
+                {
                     $lookup: {
                         from: "users",
-                        let: { empIds: "$employeeTasks.employee" },
+                        let: { empId: "$employeeTasks.employee" },
                         pipeline: [
                             {
                                 $match: {
                                     $expr: {
-                                        $in: [
-                                            "$_id",
-                                            {
-                                                $map: {
-                                                    input: "$$empIds",
-                                                    as: "id",
-                                                    in: { $toObjectId: "$$id" },
-                                                },
-                                            },
-                                        ],
+                                        $eq: ["$_id", { $toObjectId: "$$empId" }],
                                     },
                                 },
                             },
                         ],
-                        as: "emp_datas",
+                        as: "emp_detail",
                     },
                 },
                 {
-                    $unwind: "$emp_datas",
+                    $unwind: "$emp_detail",
                 },
                 {
                     $lookup: {
                         from: "employee_sub_tasks",
-                        let: { empid: "$emp_datas._id" },
+                        let: {
+                            empid: "$employeeTasks.employee",
+                            taskid: "$employeeTasks.tasks.task_id",
+                        },
                         pipeline: [
                             {
                                 $match: {
                                     $expr: {
                                         $and: [
-                                            { $eq: [{ $toObjectId: "$user_id" }, "$$empid"] },
-                                            {
-                                                $eq: [
-                                                    { $toObjectId: "$project_id" },
-                                                    { $toObjectId: id },
-                                                ],
-                                            },
+                                            { $eq: ["$user_id", "$$empid"] },
+                                            { $eq: ["$project_id", id] },
+                                            { $eq: ["$task_id", "$$taskid"] },
                                         ],
                                     },
                                 },
                             },
                         ],
-                        as: "sub_tasks",
+                        as: "sub_task_doc",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: "$sub_task_doc",
+                        preserveNullAndEmptyArrays: true,
+                    },
+                },
+                {
+                    $group: {
+                        _id: "$employeeTasks.employee",
+                        name: { $first: "$emp_detail.name" },
+                        tasks: {
+                            $push: {
+                                _id: "$employeeTasks._id",
+                                task_id: "$employeeTasks.tasks.task_id",
+                                title: "$employeeTasks.tasks.title",
+                                priority: "$employeeTasks.tasks.priority",
+                                duedate: "$employeeTasks.tasks.duedate",
+                                status: "$employeeTasks.tasks.status",
+                                user_subTaks: { $ifNull: ["$sub_task_doc.user_subTaks", []] },
+                            },
+                        },
                     },
                 },
                 {
                     $project: {
                         _id: 0,
-                        "emp_datas.name": 1,
-                        "emp_datas._id": 1,
-                        employeeTasks: 1,
-                        sub_tasks: 1,
+                        emp_datas: {
+                            _id: "$_id",
+                            name: "$name",
+                        },
+                        tasks: 1,
                     },
                 },
             ]);
-            // console.log(data);
             return data;
         },
     };

@@ -277,7 +277,9 @@ const adminCrudFunctions = (modules) => {
                                 priority: "$employeeTasks.tasks.priority",
                                 duedate: "$employeeTasks.tasks.duedate",
                                 status: "$employeeTasks.tasks.status",
-                                user_subTaks: { $ifNull: ["$sub_task_doc.user_subTaks", []] },
+                                user_subTaks: {
+                                    $ifNull: ["$sub_task_doc.user_subTaks", []],
+                                },
                             },
                         },
                     },
